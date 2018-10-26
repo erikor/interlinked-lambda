@@ -38,3 +38,22 @@ Resources:
           Properties:
             Path: /
             Method: post
+  HelloWorld:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: upload.handler
+      Runtime: python3.6
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /upload
+            Method: get
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /upload
+            Method: post
