@@ -38,7 +38,7 @@ Resources:
           Properties:
             Path: /
             Method: post
-  HelloWorld:
+  Upload:
     Type: AWS::Serverless::Function
     Properties:
       Handler: upload.handler
