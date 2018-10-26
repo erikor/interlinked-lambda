@@ -1,3 +1,9 @@
+import sys
+try:
+    import boto3
+except ImportError:
+    sys.path.append('lib')
+    import boto3
 import json
 import datetime
 
