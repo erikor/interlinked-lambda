@@ -25,11 +25,15 @@ def store(event, context, gzip = False):
     data = json.dumps(data)
     encode = "none"
     
+    if("gzip" in payload):
+        gzip = payload['gzip']
+    else:
+        gzip = False
+
     if(gzip):
         data = zipit(data)
         encode = "gzip"
 
-    
     s3 = boto3.client('s3')
     s3.put_object(
         Bucket = bucket,
@@ -42,19 +46,19 @@ def store(event, context, gzip = False):
         'body': "ok",
         'headers': {'Content-Type': 'application/json'}}
 
-def fetch(event, context, gzip = False):
-    """Fetch a doc from S3.
-
-    Keyword arguments:
-    real -- the real part (default 0.0)
-    imag -- the imaginary part (default 0.0)
-    """
+def fetch(event, context):
     payload = json.loads(event['body'])
     bucket = payload['bucket']
     if("subdir" in payload):
         subdir = os.path.join(payload['subdir'], "")
     else:
         subdir = ""
+        
+    if("gzip" in payload):
+        gzip = payload['gzip']
+    else:
+        gzip = False
+        
     key = payload['key']
     s3 = boto3.client('s3')
     obj = s3.get_object(

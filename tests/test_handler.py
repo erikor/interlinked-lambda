@@ -22,15 +22,17 @@ class TestHandlerCase(unittest.TestCase):
         print("testing upload.")
         result = model.store({"body" : '{"bucket": "interlinked",' +
                                             '"key": "1", ' +
+                                            '"gzip": "true", ' +
                                             '"subdir": "test", ' +
-                                            '"data": [1,2,3,4,5]}'}, None, True)
+                                            '"data": [1,2,3,4,5]}'}, None)
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'application/json')
 
         print("testing download.")
         result = model.fetch({"body" : '{"bucket": "interlinked",' +
                                             '"key": "1", ' +
-                                            '"subdir": "test"}'}, None, True)
+                                            '"gzip": "true", ' +
+                                            '"subdir": "test"}'}, None)
         data = json.loads(result['body'])
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(data[0], 1)
