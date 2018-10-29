@@ -13,7 +13,7 @@ from io import BytesIO
 
 # Kudos to @veselosky on GitHub for help with the compression
 
-def store(event, context, gzip = False):
+def store(event, context):
     payload = json.loads(event['body'])
     bucket = payload['bucket']
     if("subdir" in payload):
@@ -23,13 +23,41 @@ def store(event, context, gzip = False):
     key = payload['key']
     data = payload['data']
     data = json.dumps(data)
-    encode = "none"
+    
+    if("gzip" in payload):
+        gzip = payload['gzip']
+    else:
+        gzip = False
+        
+    return(load_item(key, data, bucket, subdir, gzip))
+
+    
+        
+def bulk(event, context):
+    payload = json.loads(event['body'])
+    bucket = payload['bucket']
     
     if("gzip" in payload):
         gzip = payload['gzip']
     else:
         gzip = False
 
+    if("subdir" in payload):
+        subdir = os.path.join(payload['subdir'], "")
+    else:
+        subdir = ""
+        
+    keys = payload['keys']
+    data = payload['data']
+    for i in range(len(keys)):
+        load_item(keys[i], json.dumps(data[i]), bucket, subdir, gzip)
+    return {'statusCode': 200,
+        'body': "ok",
+        'headers': {'Content-Type': 'application/json'}}
+        
+        
+def load_item(key, data, bucket, subdir, gzip = False):
+    encode = "none"
     if(gzip):
         data = zipit(data)
         encode = "gzip"
@@ -38,13 +66,15 @@ def store(event, context, gzip = False):
     s3.put_object(
         Bucket = bucket,
         Key = subdir + key,
-        ContentType = 'application/json',  # the original type
+        ContentType = 'application/json', 
         ContentEncoding = encode,
         Body = data
     )
     return {'statusCode': 200,
         'body': "ok",
         'headers': {'Content-Type': 'application/json'}}
+
+
 
 def fetch(event, context):
     payload = json.loads(event['body'])

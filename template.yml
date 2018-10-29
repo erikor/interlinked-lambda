@@ -42,7 +42,21 @@ Resources:
           Properties:
             Path: /upload
             Method: post
-
+  Bulk:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: model.bulk
+      Runtime: python2.7
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /bulk
+            Method: post
+            
   Fetch:
     Type: AWS::Serverless::Function
     Properties:
