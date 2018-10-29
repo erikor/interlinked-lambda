@@ -1,6 +1,6 @@
 import unittest
 import index
-import upload
+import model
 import sys
 try:
     import boto3
@@ -10,31 +10,30 @@ except ImportError:
 import json
 
 class TestHandlerCase(unittest.TestCase):
-
+    
     def test_response(self):
         print("testing response.")
         result = index.handler(None, None)
-        print(result)
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'application/json')
         self.assertIn('Hello World', result['body'])
 
-    def test_upload(self):
+    def test_model(self):
         print("testing upload.")
-        result = upload.handler({"body" : '{"key": "1", "data": "[1,2,3,4,5]"}'}, None)
-        print(result)
+        result = model.store({"body" : '{"bucket": "interlinked",' +
+                                            '"key": "1", ' +
+                                            '"subdir": "test", ' +
+                                            '"data": [1,2,3,4,5]}'}, None, True)
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'application/json')
 
-    def test_s3(self):
-        data = [19, "A", 43, "B"]
-        s3 = boto3.resource('s3')
-        obj = s3.Object('interlinked','test/hello.tab')
-        obj.put(Body='\n'.join(str(e) for e in data))
-        obj = s3.Object('interlinked','test/hello.tab')
-        data = obj.get()['Body'].read().decode('utf-8') 
-        print("testing s3.")
-        print data
+        print("testing download.")
+        result = model.fetch({"body" : '{"bucket": "interlinked",' +
+                                            '"key": "1", ' +
+                                            '"subdir": "test"}'}, None, True)
+        data = json.loads(result['body'])
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(data[0], 1)
 
 if __name__ == '__main__':
     unittest.main()
