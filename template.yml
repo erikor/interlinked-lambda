@@ -8,22 +8,12 @@ Parameters:
     Type: String
     Description: CodeStar projectId used to associate new resources to team members
 
-# Enable blue/green deployments using this Globals section. For instructions, see the AWS CodeStar User Guide:
-# https://docs.aws.amazon.com/codestar/latest/userguide/how-to-modify-serverless-project.html?icmpid=docs_acs_rm_tr
-#
-# Globals:
-#   Function:
-#     AutoPublishAlias: live
-#     DeploymentPreference:
-#       Enabled: true
-#       Type: Canary10Percent5Minutes
-
 Resources:
   HelloWorld:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: python3.6
+      Runtime: python2.7
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
@@ -41,8 +31,23 @@ Resources:
   Upload:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: upload.handler
-      Runtime: python3.6
+      Handler: model.store
+      Runtime: python2.7
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /upload
+            Method: post
+
+  Fetch:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: model.fetch
+      Runtime: python2.7
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
@@ -50,10 +55,5 @@ Resources:
         GetEvent:
           Type: Api
           Properties:
-            Path: /upload
+            Path: /fetch
             Method: get
-        PostEvent:
-          Type: Api
-          Properties:
-            Path: /upload
-            Method: post
