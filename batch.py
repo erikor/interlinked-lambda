@@ -23,7 +23,7 @@ def submit(event, context):
 
     res = interlinked.store_item(key, job, bucket, subdir, False)
 
-    res['body'] = client.submit_job(
+    res = client.submit_job(
         jobName = "zscore",
         jobQueue = "interlinked",
         jobDefinition = 'zscore:2',
@@ -42,4 +42,6 @@ def submit(event, context):
             'attemptDurationSeconds': 300
         }
     )
-    return res
+    return {'statusCode': 200,
+            'body': json.dumps(res),
+            'headers': {'Content-Type': 'application/json'}}
