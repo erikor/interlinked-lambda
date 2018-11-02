@@ -46,11 +46,11 @@ class TestHandlerCase(unittest.TestCase):
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(data[0], 1)
 
-    def test_submit(self):
-        print("testing job submission.")
-        result = batch.submit({"body" : '{"id": "a_test_job",' +
-                                            '"job": {"one": 3}}'}, None)
-        self.assertEqual(result['statusCode'], 200)
-        self.assertEqual(result['headers']['Content-Type'], 'application/json')
+    #def test_submit(self):
+    #    print("testing job submission.")
+    #    result = batch.submit({"body" : '{"id": "a_test_job",' +
+    #                                        '"job": {"one": 3}}'}, None)
+    #    self.assertEqual(result['statusCode'], 200)
+    #    self.assertEqual(result['headers']['Content-Type'], 'application/json')
 if __name__ == '__main__':
     unittest.main()

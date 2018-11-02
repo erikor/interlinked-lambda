@@ -21,7 +21,7 @@ def submit(event, context):
     session = boto3.session.Session()
     client = session.client('batch')
 
-    res = interlinked.store_item(key, job, bucket, subdir, gzip)
+    res = interlinked.store_item(key, job, bucket, subdir, False)
 
     res.body = client.submit_job(
         jobName = "zscore",
