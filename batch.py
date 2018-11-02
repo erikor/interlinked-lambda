@@ -43,4 +43,3 @@ def submit(event, context):
         }
     )
     return res
-)
