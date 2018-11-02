@@ -22,10 +22,11 @@ def submit(event, context):
     client = session.client('batch')
 
     res = interlinked.store_item(key, job, bucket, subdir, gzip)
+
     res.body = client.submit_job(
         jobName = "zscore",
         jobQueue = "interlinked",
-        jobDefinition = 'zscore',
+        jobDefinition = 'zscore:2',
         parameters={
             'string': 'string'
         },
