@@ -23,7 +23,7 @@ def submit(event, context):
 
     res = interlinked.store_item(key, job, bucket, subdir, False)
 
-    res.body = client.submit_job(
+    res['body'] = client.submit_job(
         jobName = "zscore",
         jobQueue = "interlinked",
         jobDefinition = 'zscore:2',
