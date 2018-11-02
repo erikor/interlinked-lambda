@@ -10,5 +10,4 @@ __pycache__/
 .Python
 build/
 dist/
-lib/
 !lib/__init__.py
