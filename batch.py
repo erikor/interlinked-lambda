@@ -18,30 +18,27 @@ def submit(event, context):
     subdir = "jobs"
     key = payload['id']
     job = json.dumps(payload['job'])
-        session = boto3.session.Session()
+    session = boto3.session.Session()
     client = session.client('batch')
-    # Submit the job
-    res = interlinked.store_item(key, job, bucket, subdir, gzip))    
+
+    res = interlinked.store_item(key, job, bucket, subdir, gzip)
     res.body = client.submit_job(
-        jobName=job1Name,
-        jobQueue=jobqueue,        
-        jobDefinition='string',
+        jobName = "zscore",
+        jobQueue = "interlinked",
+        jobDefinition = 'zscore',
         parameters={
             'string': 'string'
         },
         containerOverrides={
-            'command': [
-                'string',
-             ],
             'environment': [
                 {
-                    'name': 'string',
-                    'value': 'string'
+                    'name': 'LAMBDA_JOB_NAME',
+                    'value': key
                 },
             ]
         },
         timeout={
-            'attemptDurationSeconds': 123
+            'attemptDurationSeconds': 300
         }
     )
     return res
