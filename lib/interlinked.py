@@ -3,9 +3,29 @@ from gzip import GzipFile
 from io import BytesIO
 try:
     import boto3
+
 except ImportError:
     sys.path.append('lib')
     import boto3
+
+def check_exists(key, bucket, subdir):
+    subdir = format_dir(subdir)
+    s3 = boto3.client('s3')
+    status = 200
+    status_body = {'result': 'ok'}
+    try:
+        s3.head_object(
+            Bucket = bucket,
+            Key = subdir + key
+        )
+    except Exception as e:
+        status = 404
+        status_body = {'result': 'object ' + subdir + key + 'does not exist',
+                       'message': e}
+
+    return {'statusCode': status,
+        'body': status_body,
+        'headers': {'Content-Type': 'application/json'}}
 
 def store_item(key, data, bucket, subdir, gzip = False):
     encode = "none"
@@ -15,15 +35,22 @@ def store_item(key, data, bucket, subdir, gzip = False):
         encode = "gzip"
 
     s3 = boto3.client('s3')
-    s3.put_object(
-        Bucket = bucket,
-        Key = subdir + key,
-        ContentType = 'application/json', 
-        ContentEncoding = encode,
-        Body = data
-    )
-    return {'statusCode': 200,
-        'body': "ok",
+    status = 200
+    status_body = {'result': 'ok'}
+    try:
+        s3.put_object(
+            Bucket = bucket,
+            Key = subdir + key,
+            ContentType = 'application/json', 
+            ContentEncoding = encode,
+            Body = data
+        )
+    except Exception as e:
+        status_body = e
+        status = 501
+
+    return {'statusCode': status,
+        'body': status_body,
         'headers': {'Content-Type': 'application/json'}}
 
 def get_item(key, bucket, subdir, gzip = False):
@@ -42,7 +69,7 @@ def get_item(key, bucket, subdir, gzip = False):
     return {'statusCode': 200,
         'body': data,
         'headers': {'Content-Type': 'application/json'}}
-
+ 
 # Kudos to @veselosky on GitHub for help with the compression
 def unzipit(s):
     bytestream = BytesIO(s.read())

@@ -9,6 +9,20 @@ Parameters:
     Description: Lambda jobs for interlinked environment
 
 Resources:
+  Exists:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: model.check
+      Runtime: python2.7
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /exists
+            Method: get
   Upload:
     Type: AWS::Serverless::Function
     Properties:
