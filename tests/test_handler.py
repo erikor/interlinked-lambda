@@ -54,9 +54,10 @@ class TestHandlerCase(unittest.TestCase):
                                             '"subdir": "test", ' +
                                             '"overwrite": false, ' +
                                             '"data": [[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5]]}'}, None)
+        res = json.loads(result['body'])
+        self.assertEqual(res['objects_saved'], 0)
 
-        self.assertEqual(result['body']['objects_saved'], 0)
-        self.assertEqual(result['body']['pre_existing_objects'], 3)
+        self.assertEqual(res['pre_existing_objects'], 3)
 
         print("testing download.")
         result = model.fetch({"body" : '{"bucket": "interlinked",' +
