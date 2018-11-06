@@ -99,7 +99,7 @@ def bulk(event, context):
                 message = "LAST ERROR: " + res['body']
 
     return {'statusCode': status,
-        'body': json.dumps({'objects sent': len(keys), 
+        'body': json.dumps({'objects_sent': len(keys), 
                  'objects_saved': success_count,
                  'pre_existing_objects': pre_existing,
                  'message': message}),
