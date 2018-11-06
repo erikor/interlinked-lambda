@@ -1,4 +1,5 @@
 import os
+import json
 from gzip import GzipFile
 from io import BytesIO
 try:
@@ -50,7 +51,7 @@ def store_item(key, data, bucket, subdir, gzip = False):
         status = 501
 
     return {'statusCode': status,
-        'body': status_body,
+        'body': json.dumps(status_body),
         'headers': {'Content-Type': 'application/json'}}
 
 def get_item(key, bucket, subdir, gzip = False):
