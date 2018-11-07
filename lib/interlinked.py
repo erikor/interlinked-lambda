@@ -15,10 +15,11 @@ def check_exists(key, bucket, subdir):
     status = 200
     status_body = {'result': 'ok'}
     try:
-        s3.head_object(
+        res = s3.head_object(
             Bucket = bucket,
             Key = subdir + key
         )
+        debug("!!!!!!!! EXISTS: " + str(res))
     except Exception as e:
         status = 404
         status_body = {'result': 'object ' + subdir + key + 'does not exist',
@@ -88,3 +89,20 @@ def format_dir(s):
     s = os.path.join(s, "")
     s = s.replace("\\", "/") # os independent
     return s
+
+def debug(s):
+    bucket = "interlinked"
+    subdir = "log"
+    key = "DEBUG"
+    try:
+        log = interlinked.get_item(key, bucket, subdir, False)
+        body = log['body']
+    except Exception as e:
+        body = ""
+
+    body = str(datetime.datetime.now()) + " " + s + "\n" + body 
+
+    # only preserve the last 5000 logs
+    body = "\n".join(body.split('\n')[0:4999])
+
+    return(store_item(key, body, bucket, "log", False))
