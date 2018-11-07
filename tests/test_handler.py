@@ -36,8 +36,6 @@ class TestHandlerCase(unittest.TestCase):
         self.assertEqual(result['statusCode'], 501)
         
         print("testing check exists.")
-        result = model.check({"body": '{"key":"1","subdir":"test", "bucket":"interlinked"}'}, None)
-        self.assertEqual(result['statusCode'], 200)
         result = model.check({"body": '{"key":"foobar","subdir":"test", "bucket":"interlinked"}'}, None)
         self.assertEqual(result['statusCode'], 404)
         result = model.store({"body": '{"key":"1","data":[4.1999,4.6232,12.495,6.8865,8.9907],"subdir":"test", "bucket":"interlinked", "overwrite":false}'}, None)

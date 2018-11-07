@@ -78,7 +78,6 @@ def bulk(event, context):
         
     keys = payload['keys']
     data = payload['data']
-
     for i in range(len(keys)):
         res = interlinked.check_exists(keys[i], bucket, subdir)
         if res['statusCode'] == 200:

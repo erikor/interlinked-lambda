@@ -1,4 +1,5 @@
 import os
+import datetime
 import json
 from gzip import GzipFile
 from io import BytesIO
@@ -19,7 +20,7 @@ def check_exists(key, bucket, subdir):
             Bucket = bucket,
             Key = subdir + key
         )
-        debug("!!!!!!!! EXISTS: " + str(res))
+        debug(key + " !!!!!!!! EXISTS: " + str(res))
     except Exception as e:
         status = 404
         status_body = {'result': 'object ' + subdir + key + 'does not exist',
