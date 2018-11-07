@@ -11,7 +11,6 @@ import datetime
 from gzip import GzipFile
 from io import BytesIO
 
-#python -m unittest discover tests
 def check(event, context):
     payload = json.loads(event['body'])
     bucket = payload['bucket']
@@ -126,9 +125,15 @@ def log(event, context):
     payload = json.loads(event['body'])
     bucket = payload['bucket']
     subdir = "log"
-    key = datetime.datetime.now()
-    key = str(key).replace(" ", "_")
-    key = key + "_" + payload['level']
-    msg = payload['message']
+    key = payload['level']
+    try:
+        log = interlinked.get_item(key, bucket, subdir, False)
+        body = log['body']
+    except Exception as e:
+        body = ""
+    body = payload['message'] + "\n" + body 
 
-    return(interlinked.store_item(key, msg, bucket, "log", False))
+    # only preserve the last 1000 logs
+    body = "\n".join(body.split('\n')[0:999])
+
+    return(interlinked.store_item(key, body, bucket, "log", False))

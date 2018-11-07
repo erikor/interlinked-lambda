@@ -10,6 +10,7 @@ except ImportError:
     import boto3
 import json
 
+#python -m unittest discover tests
 class TestHandlerCase(unittest.TestCase):
     def test_auth(self):
         print("testing connectivity.")
@@ -72,7 +73,11 @@ class TestHandlerCase(unittest.TestCase):
 
     def test_logging(self):   
         print("testing logging.")
-        result = model.log({"body": '{"message": "Testing loggin", "level": "INFO", "bucket":"interlinked"}'}, None)
+        result = model.log({"body": '{"message": "Testing logging 1", "level": "INFO", "bucket":"interlinked"}'}, None)
+        self.assertEqual(result['statusCode'], 200)
+        result = model.log({"body": '{"message": "Testing logging 2", "level": "INFO", "bucket":"interlinked"}'}, None)
+        self.assertEqual(result['statusCode'], 200)
+        result = model.log({"body": '{"message": "Testing logging 2", "level": "ERROR", "bucket":"interlinked"}'}, None)
         self.assertEqual(result['statusCode'], 200)
 
     #def test_submit(self):
