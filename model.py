@@ -112,17 +112,17 @@ def bulk(event, context):
                 status = 202
                 message = "LAST ERROR: " + res['body']
         else:
-                status = 500
-                mdebug("unknown error on exists check: " + keys[i] + " -- " + res['body'])
-                message = "Unhandled error on check_exists: " + res['body']
-                return {'statusCode': status,
-                    'body': json.dumps({'objects_sent': len(keys), 
-                            'objects_saved': success_count,
-                            'pre_existing_objects': pre_existing,
-                            'message': message}),
-                    'headers': {'Content-Type': 'application/json'}}
-    
-    mdebug("finished: " + keys[i])
+            status = 500
+            mdebug("unknown error on exists check: " + keys[i] + " -- " + res['body'])
+            message = "Unhandled error on check_exists: " + res['body']
+            return {'statusCode': status,
+                'body': json.dumps({'objects_sent': len(keys), 
+                        'objects_saved': success_count,
+                        'pre_existing_objects': pre_existing,
+                        'message': message}),
+                'headers': {'Content-Type': 'application/json'}}
+        mdebug("finished: " + keys[i])
+            
     return {'statusCode': status,
         'body': json.dumps({'objects_sent': len(keys), 
                  'objects_saved': success_count,
