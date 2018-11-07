@@ -96,7 +96,7 @@ def debug(s):
     subdir = "log"
     key = "DEBUG"
     try:
-        log = interlinked.get_item(key, bucket, subdir, False)
+        log = get_item(key, bucket, subdir, False)
         body = log['body']
     except Exception as e:
         body = ""
@@ -105,5 +105,4 @@ def debug(s):
 
     # only preserve the last 5000 logs
     body = "\n".join(body.split('\n')[0:4999])
-
     return(store_item(key, body, bucket, "log", False))

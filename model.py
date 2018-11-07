@@ -11,6 +11,14 @@ import datetime
 from gzip import GzipFile
 from io import BytesIO
 
+def mdebug(s):
+    e = {"body": json.dumps({
+        "bucket": "interlinked",
+        "level": "MDEBUG",
+        "message": s
+    })}
+    log(e, None)
+    
 def check(event, context):
     payload = json.loads(event['body'])
     bucket = payload['bucket']
@@ -79,25 +87,33 @@ def bulk(event, context):
     keys = payload['keys']
     data = payload['data']
     for i in range(len(keys)):
+        mdebug("starting load: " + keys[i])
         res = interlinked.check_exists(keys[i], bucket, subdir)
         if res['statusCode'] == 200:
+            mdebug("already exists: " + keys[i])
             pre_existing += 1
             if overwrite:
+                mdebug("overwriting: " + keys[i])
                 res = interlinked.store_item(keys[i], json.dumps(data[i]), bucket, subdir, gzip)
                 if res['statusCode'] == 200:
                     success_count += 1
                 else:
+                    mdebug("error on overwrite: " + keys[i] + " -- " + res['body'])
                     status = 202
                     message = "LAST ERROR: " + res['body']
         elif res['statusCode'] == 404:
+            mdebug("storing: " + keys[i])
             res = interlinked.store_item(keys[i], json.dumps(data[i]), bucket, subdir, gzip)
             if res['statusCode'] == 200:
+                mdebug("stored: " + keys[i])
                 success_count += 1
             else:
+                mdebug("error on store: " + keys[i] + " -- " + res['body'])
                 status = 202
                 message = "LAST ERROR: " + res['body']
         else:
                 status = 500
+                mdebug("unknown error on exists check: " + keys[i] + " -- " + res['body'])
                 message = "Unhandled error on check_exists: " + res['body']
                 return {'statusCode': status,
                     'body': json.dumps({'objects_sent': len(keys), 
@@ -106,6 +122,7 @@ def bulk(event, context):
                             'message': message}),
                     'headers': {'Content-Type': 'application/json'}}
     
+    mdebug("finished: " + keys[i])
     return {'statusCode': status,
         'body': json.dumps({'objects_sent': len(keys), 
                  'objects_saved': success_count,
@@ -142,7 +159,8 @@ def log(event, context):
 
     body = str(datetime.datetime.now()) + " " + payload['message'] + "\n" + body 
 
-    # only preserve the last 1000 logs
-    body = "\n".join(body.split('\n')[0:999])
+    # only preserve the last 5000 logs
+    body = "\n".join(body.split('\n')[0:4999])
 
     return(interlinked.store_item(key, body, bucket, "log", False))
+
