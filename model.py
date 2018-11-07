@@ -87,41 +87,35 @@ def bulk(event, context):
     keys = payload['keys']
     data = payload['data']
     for i in range(len(keys)):
-        mdebug("starting load: " + keys[i])
-        res = interlinked.check_exists(keys[i], bucket, subdir)
-        if res['statusCode'] == 200:
-            mdebug("already exists: " + keys[i])
-            pre_existing += 1
-            if overwrite:
-                mdebug("overwriting: " + keys[i])
-                res = interlinked.store_item(keys[i], json.dumps(data[i]), bucket, subdir, gzip)
-                if res['statusCode'] == 200:
-                    success_count += 1
-                else:
-                    mdebug("error on overwrite: " + keys[i] + " -- " + res['body'])
-                    status = 202
-                    message = "LAST ERROR: " + res['body']
-        elif res['statusCode'] == 404:
-            mdebug("storing: " + keys[i])
+        if overwrite:
             res = interlinked.store_item(keys[i], json.dumps(data[i]), bucket, subdir, gzip)
             if res['statusCode'] == 200:
-                mdebug("stored: " + keys[i])
                 success_count += 1
             else:
-                mdebug("error on store: " + keys[i] + " -- " + res['body'])
                 status = 202
                 message = "LAST ERROR: " + res['body']
         else:
-            status = 500
-            mdebug("unknown error on exists check: " + keys[i] + " -- " + res['body'])
-            message = "Unhandled error on check_exists: " + res['body']
-            return {'statusCode': status,
-                'body': json.dumps({'objects_sent': len(keys), 
-                        'objects_saved': success_count,
-                        'pre_existing_objects': pre_existing,
-                        'message': message}),
-                'headers': {'Content-Type': 'application/json'}}
-        mdebug("finished: " + keys[i])
+            res = interlinked.check_exists(keys[i], bucket, subdir)
+            if res['statusCode'] == 200:
+                pre_existing += 1
+            elif res['statusCode'] == 404:
+                mdebug("storing: " + keys[i])
+                res = interlinked.store_item(keys[i], json.dumps(data[i]), bucket, subdir, gzip)
+                if res['statusCode'] == 200:
+                    mdebug("stored: " + keys[i])
+                    success_count += 1
+                else:
+                    status = 202
+                    message = "LAST ERROR: " + res['body']
+            else:
+                status = 500
+                message = "Unhandled error on check_exists: " + res['body']
+                return {'statusCode': status,
+                    'body': json.dumps({'objects_sent': len(keys), 
+                            'objects_saved': success_count,
+                            'pre_existing_objects': pre_existing,
+                            'message': message}),
+                    'headers': {'Content-Type': 'application/json'}}
             
     return {'statusCode': status,
         'body': json.dumps({'objects_sent': len(keys), 

@@ -46,9 +46,15 @@ class TestHandlerCase(unittest.TestCase):
                                             '"keys": ["6", "7", "8"], ' +
                                             '"gzip": "true", ' +
                                             '"subdir": "test", ' +
+                                            '"overwrite": false, ' +
+                                            '"data": [[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5]]}'}, None)
+        result = model.bulk({"body" : '{"bucket": "interlinked",' +
+                                            '"keys": ["6", "7", "8"], ' +
+                                            '"gzip": "true", ' +
+                                            '"subdir": "test", ' +
+                                            '"overwrite": false, ' +
                                             '"data": [[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5]]}'}, None)
         res = json.loads(result['body'])
-        self.assertEqual(res['objects_saved'], 3)
         self.assertEqual(res['pre_existing_objects'], 3)
 
         print("testing download.")
