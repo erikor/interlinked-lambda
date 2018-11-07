@@ -131,7 +131,8 @@ def log(event, context):
         body = log['body']
     except Exception as e:
         body = ""
-    body = payload['message'] + "\n" + body 
+
+    body = str(datetime.datetime.now()) + " " + payload['message'] + "\n" + body 
 
     # only preserve the last 1000 logs
     body = "\n".join(body.split('\n')[0:999])
