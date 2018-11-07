@@ -22,7 +22,7 @@ def check_exists(key, bucket, subdir):
     except Exception as e:
         status = 404
         status_body = {'result': 'object ' + subdir + key + 'does not exist',
-                       'message': e}
+                       'message': str(e)}
 
     return {'statusCode': status,
         'body': status_body,
@@ -47,7 +47,7 @@ def store_item(key, data, bucket, subdir, gzip = False):
             Body = data
         )
     except Exception as e:
-        status_body = e
+        status_body = str(e)
         status = 501
 
     return {'statusCode': status,

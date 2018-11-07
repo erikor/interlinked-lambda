@@ -11,14 +11,15 @@ except ImportError:
 import json
 
 class TestHandlerCase(unittest.TestCase):
-    
-    def test_response(self):
-        print("testing response.")
-        result = index.handler(None, None)
+    def test_auth(self):
+        print("testing connectivity.")
+        result = model.fetch({"body" : '{"bucket": "interlinked",' +
+                                            '"key": "2", ' +
+                                            '"gzip": "true", ' +
+                                            '"subdir": "test"}'}, None)
+        data = json.loads(result['body'])
         self.assertEqual(result['statusCode'], 200)
-        self.assertEqual(result['headers']['Content-Type'], 'application/json')
-        self.assertIn('Hello World', result['body'])
-
+   
     def test_model(self):
    
         print("testing upload.")
@@ -68,6 +69,11 @@ class TestHandlerCase(unittest.TestCase):
         data = json.loads(result['body'])
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(data[0], 1)
+
+    def test_logging(self):   
+        print("testing logging.")
+        result = model.log({"body": '{"message": "Testing loggin", "level": "INFO", "bucket":"interlinked"}'}, None)
+        self.assertEqual(result['statusCode'], 200)
 
     #def test_submit(self):
     #    print("testing job submission.")

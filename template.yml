@@ -81,3 +81,18 @@ Resources:
           Properties:
             Path: /submitjob
             Method: post
+
+  Log:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: model.log
+      Runtime: python2.7
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /log
+            Method: post

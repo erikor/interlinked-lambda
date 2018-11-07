@@ -1,4 +1,5 @@
 import sys
+import datetime
 from lib import interlinked
 try:
     import boto3
@@ -120,3 +121,14 @@ def fetch(event, context):
         
     key = payload['key']
     return interlinked.get_item(key, bucket, subdir, gzip)
+
+def log(event, context):
+    payload = json.loads(event['body'])
+    bucket = payload['bucket']
+    subdir = "log"
+    key = datetime.datetime.now()
+    key = str(key).replace(" ", "_")
+    key = key + "_" + payload['level']
+    msg = payload['message']
+
+    return(interlinked.store_item(key, msg, bucket, "log", False))
