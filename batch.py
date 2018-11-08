@@ -23,13 +23,13 @@ def submit(event, context):
         debug = payload['debug']
 
     key = str(uuid.uuid4())
-    function = payload['function']
+    function = payload['func']
     name = payload['name']
     script = payload['script']
     arguments = payload['arguments']
     job = {
         "script": script,
-        "function": function,
+        "func": function,
         "name": name,
         "arguments": arguments
     }
