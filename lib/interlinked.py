@@ -55,6 +55,24 @@ def store_item(key, data, bucket, subdir, gzip = False):
         'body': json.dumps(status_body),
         'headers': {'Content-Type': 'application/json'}}
 
+def delete_item(key, bucket, subdir):
+    subdir = format_dir(subdir)
+    s3 = boto3.client('s3')
+    status = 200
+    status_body = {'result': 'ok'}
+    try:
+        s3.delete_object(
+            Bucket = bucket,
+            Key = subdir + key
+        )
+    except Exception as e:
+        status_body = str(e)
+        status = 501
+
+    return {'statusCode': status,
+        'body': json.dumps(status_body),
+        'headers': {'Content-Type': 'application/json'}}
+
 def get_item(key, bucket, subdir, gzip = False):
     subdir = format_dir(subdir)
     s3 = boto3.client('s3')
@@ -102,6 +120,6 @@ def debug(s):
 
     body = str(datetime.datetime.now()) + " " + s + "\n" + body 
 
-    # only preserve the last 5000 logs
-    body = "\n".join(body.split('\n')[0:4999])
+    # only preserve the last 500 logs
+    body = "\n".join(body.split('\n')[0:499])
     return(store_item(key, body, bucket, "log", False))

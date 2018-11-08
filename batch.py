@@ -1,5 +1,6 @@
 import sys
 import os
+import uuid
 try:
     import boto3
 except ImportError:
@@ -12,35 +13,32 @@ import pdb
 
 # Kudos to @veselosky on GitHub for help with the compression
 def submit(event, context):
-    #pdb.set_trace()
     payload = json.loads(event['body'])
     bucket = "interlinked"
     subdir = "jobs"
-    key = payload['id']
-    job = json.dumps(payload['job'])
-    session = boto3.session.Session()
-    client = session.client('batch')
 
-    res = interlinked.store_item(key, job, bucket, subdir, False)
+    if "debug" not in payload:
+        debug = False
+    else:
+        debug = payload['debug']
 
-    res = client.submit_job(
-        jobName = "zscore",
-        jobQueue = "interlinked",
-        jobDefinition = 'zscore:2',
-        parameters={
-            'string': 'string'
-        },
-        containerOverrides={
-            'environment': [
-                {
-                    'name': 'LAMBDA_JOB_NAME',
-                    'value': key
-                },
-            ]
-        },
-        timeout={
-            'attemptDurationSeconds': 300
-        }
+    key = str(uuid.uuid4())
+    function = payload['function']
+    name = payload['name']
+    script = payload['script']
+    arguments = payload['arguments']
+    job = {
+        "script": script,
+        "function": function,
+        "name": name,
+        "arguments": arguments
+    }
+    if debug:
+        interlinked.debug("Saving job to S3: " + json.dumps(job))
+    res = interlinked.store_item(key, json.dumps(job), bucket, subdir, False)
+    if debug:
+        interlinked.debug("Job " + key + " sent to S3. Result: " + json.dumps(res)
+
     )
     return {'statusCode': 200,
             'body': json.dumps(res),

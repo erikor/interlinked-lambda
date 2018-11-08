@@ -7,7 +7,7 @@ except ImportError:
     sys.path.append('lib')
     import boto3
 import json
-import datetime
+from time import sleep
 from gzip import GzipFile
 from io import BytesIO
 
@@ -151,10 +151,28 @@ def log(event, context):
     except Exception as e:
         body = ""
 
+    wait = True
+    while wait:
+        res = interlinked.check_exists(key + "_LOCK", bucket, subdir)
+        if res['statusCode'] == 404:
+            interlinked.store_item(key + "_LOCK", str(datetime.datetime.now()), bucket, subdir)
+            wait = False
+        else:
+            a = interlinked.get_item(key + "_LOCK", bucket, subdir)
+            a = datetime.datetime.strptime(a['body'], '%Y-%m-%d %H:%M:%S.%f')
+            elapsed = (datetime.datetime.now()-a).total_seconds()
+            if(elapsed > 5):  # stale (likely orphan) lock file
+                interlinked.delete_item(key + "_LOCK", bucket, subdir)
+                wait = False
+            else:
+                sleep(0.05)
+
     body = str(datetime.datetime.now()) + " " + payload['message'] + "\n" + body 
 
     # only preserve the last 5000 logs
     body = "\n".join(body.split('\n')[0:4999])
 
-    return(interlinked.store_item(key, body, bucket, "log", False))
+    result = interlinked.store_item(key, body, bucket, "log", False)
+    interlinked.delete_item(key + "_LOCK", bucket, subdir)
+    return(result)
 
