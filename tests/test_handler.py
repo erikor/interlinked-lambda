@@ -78,7 +78,7 @@ class TestHandlerCase(unittest.TestCase):
 
     def test_submit(self):
         print("testing job submission.")
-        result = batch.submit({"body" : '{"debug": true, "name": "test job", "function": "test function",' +
+        result = batch.submit({"body" : '{"debug": true, "name": "test job", "func": "test function",' +
                                          '"script": "none",' +
                                          '"arguments": "none"}'}, None)
         print(result)
