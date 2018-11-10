@@ -78,9 +78,9 @@ class TestHandlerCase(unittest.TestCase):
 
     def test_submit(self):
         print("testing job submission.")
-        result = batch.submit({"body" : '{"debug": true, "name": "test job", "func": "test function",' +
-                                         '"script": "none",' +
-                                         '"arguments": "none"}'}, None)
+        result = batch.submit({"body" : '{"debug": true, "name": "lambda test 1", "func": "myfunc",' +
+                                         '"script": "test.r",' +
+                                         '"arguments": {"a": 1, "b": 2}}'}, None)
         print(result)
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'application/json')

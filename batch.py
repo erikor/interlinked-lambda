@@ -27,19 +27,32 @@ def submit(event, context):
     name = payload['name']
     script = payload['script']
     arguments = payload['arguments']
-    job = {
+    job_d = {
         "script": script,
         "func": function,
         "name": name,
         "arguments": arguments
     }
     if debug:
-        interlinked.debug("Saving job to S3: " + json.dumps(job))
-    res = interlinked.store_item(key, json.dumps(job), bucket, subdir, False)
+        interlinked.debug("Saving job to S3: " + json.dumps(job_d))
+    res = interlinked.store_item(key, json.dumps(job_d), bucket, subdir, False)
     if debug:
         interlinked.debug("Job " + key + " sent to S3. Result: " + json.dumps(res)
 
     )
+    client = boto3.client('batch', region_name = 'ca-central-1')
+    job = client.submit_job(jobName='interlinked_lambda_job',
+                            jobQueue='interlinked',
+                            jobDefinition='smalljob:1',
+                            containerOverrides={
+                                'environment': [
+                                    {
+                                        'name': 'LAMBDA_JOB_ID',
+                                        'value': key
+                                    }]
+                                }
+                            )
+
     return {'statusCode': 200,
-            'body': json.dumps(res),
+            'body': json.dumps(job),
             'headers': {'Content-Type': 'application/json'}}

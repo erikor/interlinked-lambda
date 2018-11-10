@@ -59,4 +59,12 @@ library(httr)
   POST(url, body = toJSON(job), auto_unbox = TRUE))
 
 ```
-That endpoint will save the job in S3 under a unique key. The lambda endpoint will then submit this job, setting the environment variable LAMBDA_JOB_ID to the UUID of this job description, and running `Rscript start_job.r`.   
+That endpoint will save the job in S3 under a unique key. The lambda endpoint will then submit this job, setting the environment variable LAMBDA_JOB_ID to the UUID of this job description, and running `Rscript /tmp/start.r`, which is simply:
+
+```
+library(interlinker)
+
+job <- Sys.getenv("LAMBDA_JOB_ID")
+runJob(UUID, debug = TRUE)
+
+```
