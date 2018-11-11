@@ -142,38 +142,9 @@ def fetch(event, context):
 
 def log(event, context):
     payload = json.loads(event['body'])
-    bucket = payload['bucket']
-    subdir = "log"
-    key = payload['level']
-    try:
-        log = interlinked.get_item(key, bucket, subdir, False)
-        body = log['body']
-    except Exception as e:
-        body = ""
-
-    #wait = True
-    #while wait:
-    #    res = interlinked.check_exists(key + "_LOCK", bucket, subdir)
-    #    if res['statusCode'] == 404:
-    #        interlinked.store_item(key + "_LOCK", str(datetime.datetime.now()), bucket, subdir)
-    #        wait = False
-    #    else:
-    #        a = interlinked.get_item(key + "_LOCK", bucket, subdir)
-    #        a = datetime.datetime.strptime(a['body'], '%Y-%m-%d %H:%M:%S.%f')
-    #        elapsed = (datetime.datetime.now()-a).total_seconds()
-    #        if(elapsed > 5):  # stale (likely orphan) lock file
-    #            interlinked.delete_item(key + "_LOCK", bucket, subdir)
-    #            wait = False
-    #        else:
-    #            sleep(0.05)
-
-    #body = str(datetime.datetime.now()) + " " + payload['message'] + "\n" + body 
-
-    # only preserve the last 5000 logs
-    #body = "\n".join(body.split('\n')[0:4999])
-
-    #result = interlinked.store_item(key, body, bucket, "log", False)
-    #interlinked.delete_item(key + "_LOCK", bucket, subdir)
     print("LOG EVENT: " + payload['level'] + " " + payload['message'])
-    return(result)
+    return {'statusCode': 200,
+            'body': {'result': 'ok'},
+            'headers': {'Content-Type': 'application/json'}}
+
 
