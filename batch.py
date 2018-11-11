@@ -43,7 +43,7 @@ def submit(event, context):
     client = boto3.client('batch', region_name = 'ca-central-1')
     job = client.submit_job(jobName='interlinked_lambda_job',
                             jobQueue='interlinked',
-                            jobDefinition='smalljob:1',
+                            jobDefinition='smalljob:2',
                             containerOverrides={
                                 'environment': [
                                     {
